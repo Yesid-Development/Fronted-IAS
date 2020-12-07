@@ -1,0 +1,99 @@
+// Colors
+$gray1: #737373;
+$gray2: #b4b5b9;
+$pink: #e03b65;
+$red: rgba(255, 0, 0, 0.418);
+$green: rgba(0, 128, 0, 0.418);
+
+// Fonts
+$roboto: 'Roboto', sans-serif;
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: $roboto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  h1 {
+    font-size: 1.7rem;
+    font-weight: bold;
+  }
+
+  p {
+    color: $gray1;
+    font-weight: 500;
+    line-height: 1.2rem;
+    padding: 1rem;
+  }
+
+  .container-form {
+    box-shadow: 1px 3px 15px 0px rgba(0, 0, 0, 0.2);
+    border-radius: 30px;
+    margin: 1rem 0;
+
+    .error {
+      background-color: $red;
+      border-radius: 30px;
+      color: white;
+      font-size: 1rem;
+      font-weight: bold;
+      margin-top: 0.5rem;
+      padding: 0.5rem 0.5rem;
+    }
+
+    .success {
+      background-color: $green;
+      border-radius: 30px;
+      color: white;
+      font-size: 1rem;
+      font-weight: bold;
+      margin-top: 0.5rem;
+      padding: 0.5rem 0.5rem;
+    }
+
+    label {
+      color: black;
+      font-weight: bold;
+    }
+
+    select {
+      border-radius: 8px;
+      .placeholder {
+        color: $gray2;
+        font-weight: 500;
+      }
+    }
+
+    input[type='number']::-webkit-inner-spin-button,
+    input[type='number']::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    input[type='number'] {
+      -moz-appearance: textfield;
+    }
+
+    input {
+      border-radius: 8px;
+      &::placeholder {
+        color: $gray2;
+        font-weight: 500;
+      }
+    }
+
+    .btn-primary {
+      background-color: $pink;
+      border: none;
+      border-radius: 30px;
+      font-size: 0.9rem;
+      font-weight: bold;
+      padding: 0.8rem 2.4rem;
+    }
+  }
+
+  .react-time-picker__wrapper {
+    border: none;
+  }
+}
