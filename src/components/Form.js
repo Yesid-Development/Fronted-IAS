@@ -1,19 +1,14 @@
-import React, { useState, useEffect, useReducer } from 'react';
-import TimePicker from 'react-time-picker';
+import React, { useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
 const Form = () => {
   // States
-  const [startDate, setStartDate] = useState(new Date());
-  const [initHour, setInitHour] = useState('8:00');
-  const [finalHour, setFinalHour] = useState('10:00');
   const [service, setService] = useState({
     idTechnician: '',
     idService: '',
-    date: startDate,
-    initialHour: initHour,
-    finalHour: finalHour,
+    initialDate: new Date(),
+    finalDate: new Date(),
   });
   const [error, setError] = useState({
     errTechnician: '',
@@ -92,7 +87,6 @@ const Form = () => {
           <input
             type="number"
             className="form-control"
-            id="idService"
             name="idService"
             placeholder="Solo numeros"
             value={idService}
@@ -102,42 +96,43 @@ const Form = () => {
             <p className="error text-center">{errService}</p>
           ) : null}
         </div>
+
         <div className="form-group d-flex flex-column">
-          <label htmlFor="date">Dia</label>
+          <label htmlFor="initialDate">Dia</label>
           <DatePicker
+            showTimeSelect
             className="form-control"
-            id="date"
-            name="date"
-            selected={startDate}
-            onChange={(date) => setStartDate(date)}
+            name="initialDate"
+            selected={service.initialDate}
+            onChange={(date) =>
+              setService({
+                ...service,
+                initialDate: date,
+              })
+            }
+            dateFormat="MMMM d, yyyy h:mm aa"
           />
           {errDate ? <p className="error text-center">{errDate}</p> : null}
         </div>
-        <div className="form-group">
-          <label htmlFor="initialHour">Hora inicial (hora militar)</label>
 
-          <TimePicker
+        <div className="form-group d-flex flex-column">
+          <label htmlFor="finalDate">Dia</label>
+          <DatePicker
+            showTimeSelect
             className="form-control"
-            id="initialHour"
-            name="initialHour"
-            disableClock="true"
-            onChange={setInitHour}
-            value={initHour}
+            name="finalDate"
+            selected={service.finalDate}
+            onChange={(date) =>
+              setService({
+                ...service,
+                finalDate: date,
+              })
+            }
+            dateFormat="MMMM d, yyyy h:mm aa"
           />
-          {errHour ? <p className="error text-center">{errHour}</p> : null}
+          {errDate ? <p className="error text-center">{errDate}</p> : null}
         </div>
-        <div className="form-group">
-          <label htmlFor="finalHour">Hora final (hora militar)</label>
-          <TimePicker
-            className="form-control"
-            id="finalHour"
-            name="finalHour"
-            disableClock="true"
-            onChange={setFinalHour}
-            value={finalHour}
-          />
-          {errHour ? <p className="error text-center">{errHour}</p> : null}
-        </div>
+
         {(() => {
           globalErrorsValidation();
         })()}
