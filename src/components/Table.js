@@ -8,7 +8,7 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-
+import _ from 'lodash';
 const useStyles = makeStyles({
   table: {
     minWidth: 650,
@@ -52,7 +52,7 @@ const CalculatorTable = () => {
   }, []);
 
   const receiveData = async () => {
-    let resp = await fetch('http://localhost:4000/api/show');
+    let resp = await fetch('http://localhost:4000/api/findAll');
     const data = await resp.json();
     validData(data);
     setState({
@@ -62,41 +62,72 @@ const CalculatorTable = () => {
   };
 
   const validData = (data) => {
-    
-    const finalData = data.map((item) => {
-      console.log(item);
-      const initDate = moment(item.initialDate);
-      const endDate = moment(item.finalDate);
-      const duration = moment.duration(initDate.diff(endDate));
-      const finalObject = {};
-      const workHours = endDate.diff(initDate, 'hours');
-      console.log('MOment: ', duration.asHours());
-      console.log('Otroo: ', initDate.diff(endDate, 'hours'));
-      console.log('Cambio: ', endDate.diff(initDate, 'hours'));
-      console.log('Day: ', endDate.day());
-      console.log('Week: ', endDate.week());
-      console.log('Hour: ', endDate.hour());
+    const finalData = data.map((technician) => {
+      let countH = 0;
+      console.log(technician);
+      let other = _.chain(technician.items)
+        .map((item) => {
+          const initDate = moment(item.initialDate);
+          const endDate = moment(item.finalDate);
+          const workHours = endDate.diff(initDate, 'hours');
+          const finalObject = {};
 
-      // Dias normales
-      if (initDate.day() >= 1 && endDate.day() <= 6) {
-        if (workHours <= 13 && initDate.hour() != 20) {
-          finalObject['normalHours'] = 13;
-        } else {
-          if (initDate.hour() == 20) {
-            finalObject['nightHours'] = endDate.diff(initDate, 'hours');
+          if (
+            initDate.day() >= 1 &&
+            initDate.day() <= 6 &&
+            endDate.day() >= 1 &&
+            endDate.day() <= 6
+          ) {
+            if (workHours <= 13 && initDate.hour() <= 20) {
+              if (countH >= 48) {
+                console.log('Entro a extras puras');
+                finalObject['normalHoursEx'] = endDate.diff(initDate, 'hours');
+              } else {
+                const aux = endDate.diff(initDate, 'hours');
+                console.log('Entro a extras partidas', aux, countH);
+                if (countH + aux >= 48) {
+                  console.log('Entro a extras partidas');
+                  const auxEx = 48 - countH;
+                  finalObject['normalHoursEx'] = auxEx;
+                  finalObject['normalHours'] = aux - auxEx;
+                  countH = 48;
+                } else {
+                  console.log('Entro a normales');
+                  countH += endDate.diff(initDate, 'hours');
+                  finalObject['normalHours'] = endDate.diff(initDate, 'hours');
+                }
+
+                console.log('#####Contador: ', countH);
+              }
+            } else {
+              if (initDate.hour() > 20) {
+                if (countH >= 48) {
+                  finalObject['nightHoursEx'] = endDate.diff(initDate, 'hours');
+                } else {
+                  finalObject['nightHours'] = endDate.diff(initDate, 'hours');
+                  countH += endDate.diff(initDate, 'hours');
+                }
+              }
+            }
+          } else {
+            if (initDate.day() === 0) {
+              if (countH >= 48) {
+                finalObject['sundayHoursEx'] = endDate.diff(initDate, 'hours');
+              } else {
+                finalObject['sundayHours'] = endDate.diff(initDate, 'hours');
+                countH += endDate.diff(initDate, 'hours');
+              }
+            }
           }
-        }
-      } else {
-        if (initDate.day() == 0) {
-          finalObject['sundayHours'] = endDate.diff(initDate, 'hours');
-        }
-      }
-      finalObject['week'] = initDate.week();
-      return finalObject;
+          finalObject['week'] = initDate.week();
+          item = _.assign(item, finalObject);
+          return item;
+        })
+        .value();
+      console.log('-----Prueba: ', other);
     });
-
-    console.log('DataFinal: ', finalData);
   };
+
   const handleChange = (e) => {
     let search = state.data.filter((item) => {
       if (item.idService.toString().includes(e.target.value)) {
@@ -111,7 +142,7 @@ const CalculatorTable = () => {
 
   return (
     <>
-      <div class="row mb-3">
+      <div className="row mb-3">
         <div className="col-3">
           <input className="form-control" onKeyUp={handleChange} type="text" />
         </div>
