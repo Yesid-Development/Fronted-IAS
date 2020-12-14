@@ -1,39 +1,38 @@
 import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
-const Form = () => {
-  // States
+import schema from '../utils/form_schema';
+
+const Form = ({ receiveData }) => {
+  const { register, handleSubmit, errors } = useForm({
+    resolver: yupResolver(schema),
+  });
+
   const [service, setService] = useState({
     idTechnician: '',
     idService: '',
-    initialDate: new Date(),
-    finalDate: new Date(),
-  });
-  const [error, setError] = useState({
-    errTechnician: '',
-    errService: '',
-    errDate: '',
-    errHour: '',
-    errGlobal: '',
+    initialDate: undefined,
+    finalDate: undefined,
   });
 
-  // Variables
   const [success, setSuccess] = useState('');
   const { idTechnician, idService } = service;
-  const { errTechnician, errService, errDate, errHour, errGlobal } = error;
 
-  // Methods
   const sendForm = async () => {
     const requestOptions = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(service),
     };
-    await fetch(
-      'http://localhost:4000/api/add',
-      requestOptions
-    ).then((response) => response.json());
+    await fetch('http://localhost:4000/api/add', requestOptions).then(
+      (response) => {
+        receiveData();
+        response.json();
+      }
+    );
   };
 
   const handleChange = (e) => {
@@ -43,28 +42,16 @@ const Form = () => {
     });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    const pattern = new RegExp('^[a-zA-Z ]+$');
-
-    // TODO: Validations
+  const onSubmit = () => {
     sendForm();
-  };
-
-  const globalErrorsValidation = () => {
-    if (success && errGlobal === '') {
-      return <p className="success text-center">{success}</p>;
-    } else if (errGlobal) {
-      return <p className="error text-center">{errGlobal}</p>;
-    } else return null;
+    setSuccess('Registro exitoso');
   };
 
   return (
     <div className="container-form">
       <form
         className="p-5 mt-5 form-contacto needs-validation"
-        onSubmit={handleSubmit}
+        onSubmit={handleSubmit(onSubmit)}
         method="POST"
       >
         <div className="form-group">
@@ -77,9 +64,10 @@ const Form = () => {
             placeholder="Solo numeros"
             value={idTechnician}
             onChange={handleChange}
+            ref={register}
           />
-          {errTechnician ? (
-            <p className="error text-center">{errTechnician}</p>
+          {errors.idTechnician ? (
+            <p className="error text-center">{errors.idTechnician?.message}</p>
           ) : null}
         </div>
         <div className="form-group">
@@ -91,14 +79,15 @@ const Form = () => {
             placeholder="Solo numeros"
             value={idService}
             onChange={handleChange}
+            ref={register}
           />
-          {errService ? (
-            <p className="error text-center">{errService}</p>
-          ) : null}
+          {errors.idService && (
+            <p className="error text-center">{errors.idService?.message}</p>
+          )}
         </div>
 
         <div className="form-group d-flex flex-column">
-          <label htmlFor="initialDate">Dia</label>
+          <label htmlFor="initialDate">Dia/Hora Inicial</label>
           <DatePicker
             showTimeSelect
             className="form-control"
@@ -110,13 +99,16 @@ const Form = () => {
                 initialDate: date,
               })
             }
+            ref={register}
             dateFormat="MMMM d, yyyy h:mm aa"
           />
-          {errDate ? <p className="error text-center">{errDate}</p> : null}
+          {errors.initialDate && (
+            <p className="error text-center">{errors.initialDate?.message}</p>
+          )}
         </div>
 
         <div className="form-group d-flex flex-column">
-          <label htmlFor="finalDate">Dia</label>
+          <label htmlFor="finalDate">Dia/Hora Final</label>
           <DatePicker
             showTimeSelect
             className="form-control"
@@ -128,14 +120,14 @@ const Form = () => {
                 finalDate: date,
               })
             }
+            ref={register}
             dateFormat="MMMM d, yyyy h:mm aa"
           />
-          {errDate ? <p className="error text-center">{errDate}</p> : null}
+          {errors.finalDate && (
+            <p className="error text-center">{errors.finalDate?.message}</p>
+          )}
         </div>
-
-        {(() => {
-          globalErrorsValidation();
-        })()}
+        {success && <p className="success text-center">{success}</p>}
         <div className="text-center">
           <button type="submit" className="btn btn-primary text-uppercase">
             Agregar
