@@ -14,8 +14,13 @@ const Form = ({ receiveData }) => {
   const [service, setService] = useState({
     idTechnician: '',
     idService: '',
-    initialDate: undefined,
-    finalDate: undefined,
+    initialDate: '',
+    finalDate: '',
+  });
+
+  const [dateErrors, setDateErrors] = useState({
+    errInitialDate: '',
+    errFinalDate: '',
   });
 
   const [success, setSuccess] = useState('');
@@ -93,17 +98,33 @@ const Form = ({ receiveData }) => {
             className="form-control"
             name="initialDate"
             selected={service.initialDate}
-            onChange={(date) =>
-              setService({
-                ...service,
-                initialDate: date,
-              })
-            }
+            onChange={(date) => {
+              if (Date.parse(date) >= Date.parse(service.finalDate)) {
+                setDateErrors({
+                  ...dateErrors,
+                  errInitialDate:
+                    'La fecha/hora inicial debe ser menor a la final',
+                });
+              } else {
+                setDateErrors({
+                  ...dateErrors,
+                  errInitialDate: '',
+                });
+                setService({
+                  ...service,
+                  initialDate: date,
+                });
+              }
+            }}
             ref={register}
             dateFormat="MMMM d, yyyy h:mm aa"
           />
-          {errors.initialDate && (
-            <p className="error text-center">{errors.initialDate?.message}</p>
+          {service.initialDate === '' ? (
+            <p className="error text-center">Este campo es obligatorio</p>
+          ) : (
+            dateErrors.errInitialDate && (
+              <p className="error text-center">{dateErrors.errInitialDate}</p>
+            )
           )}
         </div>
 
@@ -114,17 +135,33 @@ const Form = ({ receiveData }) => {
             className="form-control"
             name="finalDate"
             selected={service.finalDate}
-            onChange={(date) =>
-              setService({
-                ...service,
-                finalDate: date,
-              })
-            }
+            onChange={(date) => {
+              if (Date.parse(date) <= Date.parse(service.initialDate)) {
+                setDateErrors({
+                  ...dateErrors,
+                  errFinalDate:
+                    'La fecha/hora final debe ser mayor a la inicial',
+                });
+              } else {
+                setDateErrors({
+                  ...dateErrors,
+                  errFinalDate: '',
+                });
+                setService({
+                  ...service,
+                  finalDate: date,
+                });
+              }
+            }}
             ref={register}
             dateFormat="MMMM d, yyyy h:mm aa"
           />
-          {errors.finalDate && (
-            <p className="error text-center">{errors.finalDate?.message}</p>
+          {service.finalDate === '' ? (
+            <p className="error text-center">Este campo es obligatorio</p>
+          ) : (
+            dateErrors.errFinalDate && (
+              <p className="error text-center">{dateErrors.errFinalDate}</p>
+            )
           )}
         </div>
         {success && <p className="success text-center">{success}</p>}

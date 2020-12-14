@@ -63,13 +63,12 @@ const CalculatorTable = ({ receiveData, state, search, setSearch }) => {
           <TableHead>
             <TableRow>
               <TableCell>ID tecnico</TableCell>
-              <TableCell align="right">week</TableCell>
+              <TableCell align="right">Semana</TableCell>
               <TableCell align="right">Horas normales</TableCell>
-              <TableCell align="right">Horas Nocturanas</TableCell>
+              <TableCell align="right">Horas Nocturnas</TableCell>
               <TableCell align="right">Horas Dominicales</TableCell>
               <TableCell align="right">Horas Normales Extras</TableCell>
               <TableCell align="right">Horas Dominicales Extras</TableCell>
-              <TableCell align="right">Total horas</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -82,7 +81,6 @@ const CalculatorTable = ({ receiveData, state, search, setSearch }) => {
                 <TableCell align="right">{row.sundayHours}</TableCell>
                 <TableCell align="right">{row.normalHoursEx}</TableCell>
                 <TableCell align="right">{row.sundayHoursEx}</TableCell>
-                <TableCell align="right">{row.total}</TableCell>
               </TableRow>
             ))}
           </TableBody>
